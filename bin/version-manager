@@ -1,0 +1,743 @@
+#!/usr/bin/env bash
+
+# ------------
+# This sets the version of this project. Replaces some variables if needed.
+#
+# @author    Björn Hempel <bjoern@hempel.li>
+# @version   0.1.0 (2022-01-15)
+# ------------
+
+# ------------
+# MIT License
+#
+# Copyright (c) 2022 Björn Hempel
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+#
+# Written by Björn Hempel <bjoern@hempel.li>.
+# ------------
+
+# path configs
+PATH_SCRIPT_ABSOLUTE="$(cd -- "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1; pwd -P)"
+PATH_WORKING="$PWD"
+
+# some environment variables
+ENV_SCRIPT_NAME=$(basename "${BASH_SOURCE[0]}")
+ENV_VERSION="0.1.0"
+ENV_VERSION_DATE="2022-01-16"
+ENV_AUTHOR='Björn Hempel'
+ENV_EMAIL='bjoern@hempel.li'
+ENV_INIT_VERSION="0.1.0"
+ENV_GIT_ADD_FILES=" CHANGELOG.md"
+
+# path files
+PATH_VERSION_RELATIVE="VERSION"
+PATH_ENV_RELATIVE=".env"
+
+# default variables
+ENV_TEST=false
+ENV_ONLY_SHOW_CURRENT=false
+ENV_NO_CONFIRMATION=false
+ENV_MAJOR=false
+ENV_MINOR=false
+ENV_PATCH=false
+
+# =====
+#
+# Helper function: Get version from parameter
+#
+# =====
+function getVersion()
+{
+    local version="${PARAMETERS[0]}"
+
+    echo "$version"
+}
+
+# =====
+#
+# Helper function: Get current version from file
+#
+# =====
+function getCurrentVersion()
+{
+    local versionPath="$PATH_WORKING/$PATH_VERSION_RELATIVE"
+
+    if [ ! -f "$versionPath" ]; then
+        echo && error "Version file \"$versionPath\" not found. Abort."
+        echo && showVersion && showHelp && exit 1
+    fi
+
+    # shellcheck disable=SC2155
+    local version=$(cat "$versionPath")
+
+    echo "$version"
+}
+
+# =====
+#
+# Helper function: Returns the major version.
+#
+# =====
+function getMajorVersion()
+{
+    local currentVersion=$(getCurrentVersion)
+    local majorVersion=$(echo "$currentVersion" | sed 's/^\([0-9]\+\)\.[0-9]\+\.[0-9]\+$/\1/')
+
+    # Increase version
+    ((majorVersion=majorVersion+1))
+
+    echo -n "$currentVersion" | sed "s/^[0-9]\+\.[0-9]\+\.[0-9]\+$/${majorVersion}.0.0/"
+}
+
+# =====
+#
+# Helper function: Returns the minor version.
+#
+# =====
+function getMinorVersion()
+{
+    local currentVersion=$(getCurrentVersion)
+    local minorVersion=$(echo "$currentVersion" | sed 's/^[0-9]\+\.\([0-9]\+\)\.[0-9]\+$/\1/')
+
+    # Increase version
+    ((minorVersion=minorVersion+1))
+
+    echo -n "$currentVersion" | sed "s/^\([0-9]\+\.\)[0-9]\+\.[0-9]\+$/\1${minorVersion}.0/"
+}
+
+# =====
+#
+# Helper function: Returns the patch version.
+#
+# =====
+function getPatchVersion()
+{
+    local currentVersion=$(getCurrentVersion)
+    local patchVersion=$(echo "$currentVersion" | sed 's/^[0-9]\+\.[0-9]\+\.\([0-9]\+\)$/\1/')
+
+    # Increase version
+    ((patchVersion=patchVersion+1))
+
+    echo -n "$currentVersion" | sed "s/^\([0-9]\+\.\)\([0-9]\+\.\)[0-9]\+$/\1\2${patchVersion}/"
+}
+
+# =====
+#
+# Helper function: Print info/error message
+#
+# =====
+function message
+{
+    local message="$1"
+    local messageType="${2:-info}"
+    local lineBreak=${3:-true}
+    local first=${4:-true}
+    local logTime=${6:-$SETTING_SHOW_TIME}
+    local startTime=$(date '+%Y-%m-%d %H:%M:%S')
+
+    # Print the start of the message
+    if $first; then
+        $logTime && echo -n "[$startTime] "
+
+        printf "%-9s → " "($messageType)"
+    fi
+
+    # Print the given message
+    echo -n "$message"
+
+    # Adds a line break
+    if $lineBreak; then
+        echo
+    else
+        echo -n " "
+    fi
+
+    # remove color
+    echo -ne "$RESET"
+}
+
+# =====
+#
+# Helper function: Print info
+#
+# =====
+function info
+{
+    # show message(string $message, bool $lineBreak = true, bool $firstPart = true, bool $logToFile = false)
+    message "$1" "info" ${2:-true} ${3:-true} ${4:-false}
+}
+
+# =====
+#
+# Helper function: Print success
+#
+# =====
+function success
+{
+    # set color
+    echo -ne "$GREEN"
+
+    # show message(string $message, bool $lineBreak = true, bool $firstPart = true, bool $logToFile = false)
+    message "$1" "success" ${2:-true} ${3:-true} ${4:-false}
+
+    # remove color
+    echo -ne "$RESET"
+}
+
+# =====
+#
+# Helper function: Print error
+#
+# =====
+function error
+{
+    # set color
+    echo -ne "$RED"
+
+    # show message(string $message, bool $lineBreak = true, bool $firstPart = true, bool $logToFile = true)
+    message "$1" "error" ${2:-true} ${3:-true} ${4:-true}
+
+    # remove color
+    echo -ne "$RESET"
+}
+
+
+# =====
+#
+# Helper function: show help
+#
+# =====
+function showHelp
+{
+    cat "${BASH_SOURCE[0]}" | grep --color=never "# help:" | grep -v 'cat parameter' | sed 's/[ ]*# help:\([ ]\|\)//g' | sed "s~%scriptname%~$ENV_SCRIPT_NAME~g" | sed "s~\$PWD~\"$PWD\"~"
+}
+
+# =====
+#
+# Helper function: show version
+#
+# =====
+function showVersion
+{
+    echo "$ENV_SCRIPT_NAME $ENV_VERSION ($ENV_VERSION_DATE) - $ENV_AUTHOR <$ENV_EMAIL>"
+}
+
+# =====
+#
+# Helper function: Ask user to add new version
+#
+# =====
+function askUser()
+{
+    local question="$1"
+
+    # Do not ask the user
+    if $ENV_NO_CONFIRMATION; then
+        return 0
+    fi
+
+    # Ask user
+    echo -n "$question "
+
+    # Read key
+    # shellcheck disable=SC2162
+    read -s -n 1 key && echo "$key"
+
+    # Check key
+    case "$key" in
+
+        # y pressed
+        y|Y)
+            echo
+            ;;
+
+        # n pressed
+        n|N)
+            echo
+            info "The operation was canceled by the user. Abort."
+            echo
+            exit
+            ;;
+
+        # invalid key
+        *)
+            echo
+            error "Please press y or n. Abort."
+            echo
+            exit
+            ;;
+    esac
+}
+
+# =====
+#
+# Helper function: Write version to file
+#
+# =====
+function writeVersion()
+{
+    # Get parameter
+    local versionPath="$1"
+    local newVersion="$2"
+    local type="$3"
+
+    # Change version
+    ! $ENV_TEST && info "Set version \"$newVersion\" to \"$versionPath\""
+    case "$type" in
+
+        # Direct mode.
+        1)
+            echo "$newVersion" > "$versionPath"
+            ;;
+
+        # Change VERSION_APP.
+        2)
+            sed -i "s/^VERSION_APP=.*/VERSION_APP=$newVersion/" "$versionPath"
+            ;;
+
+        # Unsupported type.
+        *)
+            echo && error "Unsupported type mode. Abort."
+            echo && exit 1
+            ;;
+    esac
+    ! $ENV_TEST && success "Done."
+}
+
+# =====
+#
+# Helper function: Execute tests
+#
+# =====
+function executeTests()
+{
+    # Test major version.
+    local returnCodeMajor
+    local returnValuesMajor
+    returnValuesMajor=$(${BASH_SOURCE[0]} --test --major)
+    returnCodeMajor=$?
+    echo "$returnValuesMajor"
+
+    # Check major version.
+    if [ $returnCodeMajor -gt 0 ]; then
+        echo && error "The major test was not completed successfully and ends with code $returnCodeMajor." && echo && exit $returnCodeMajor
+    fi
+
+    # Test minor version.
+    local returnCodeMinor
+    local returnValuesMinor
+    returnValuesMinor=$(${BASH_SOURCE[0]} --test --minor)
+    returnCodeMinor=$?
+    echo "$returnValuesMinor"
+
+    # Check minor version.
+    if [ $returnCodeMinor -gt 0 ]; then
+        echo && error "The minor test was not completed successfully and ends with code $returnCodeMinor." && echo && exit $returnCodeMinor
+    fi
+
+    # Test patch version
+    local returnCodePatch
+    local returnValuesPatch
+    returnValuesPatch=$(${BASH_SOURCE[0]} --test --patch)
+    returnCodePatch=$?
+    echo "$returnValuesPatch"
+
+    # Check patch version.
+    if [ $returnCodePatch -gt 0 ]; then
+        echo && error "The major test was not completed successfully and ends with code $returnCodePatch." && echo && exit $returnCodePatch
+    fi
+
+    # All tests are successfully
+    echo && success "All tests were completed successfully." && echo && exit 0
+}
+
+# =====
+#
+# Task: Reads parameter
+#
+# =====
+function readParameter
+{
+    # help:
+    # help: Usage: %scriptname% [...options] [version]
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+
+            # help:
+            # help:  -c,    --current                     Shows the current version.
+            -c|--current)
+                ENV_ONLY_SHOW_CURRENT=true
+                ;;
+
+
+            # help:
+            # help:  -X,    --major                       Will increase the major version (x.0.0).
+            -X|--major)
+                ENV_MAJOR=true
+                ENV_MINOR=false
+                ENV_PATCH=false
+                ;;
+
+            # help:  -m,    --minor                       Will increase the minor version (0.x.0).
+            -m|--minor)
+                ENV_MAJOR=false
+                ENV_MINOR=true
+                ENV_PATCH=false
+                ;;
+
+            # help:  -p,    --patch                       Will increase the patch version (0.0.x).
+            -p|--patch)
+                ENV_MAJOR=false
+                ENV_MINOR=false
+                ENV_PATCH=true
+                ;;
+
+
+            # help:
+            # help:  -w,    --working-dir                 Sets the current working-dir (default: $PWD)
+            -w|--working-dir)
+                PATH_WORKING="$2"
+                shift
+                ;;
+            -w=*|--working-dir=*)
+                PATH_WORKING="${1#*=}"
+                shift
+                ;;
+
+
+            # help:
+            # help:  -s,    --show-hints                  Shows some hints.
+            -s|--show-hints)
+                echo && showHints && exit 0
+                ;;
+
+            # help:  -h,    --help                        Shows this help.
+            -h|--help)
+                echo && showVersion && showHelp && exit 0
+                ;;
+
+            # help:  -V,    --version                     Shows the version number.
+            -V|--version)
+                showVersion && exit 0
+                ;;
+
+            # do not show this ;):
+            # do not show this ;):  -t,    --test                        Test mode
+            -t|--test)
+                ENV_TEST=true
+                ENV_NO_CONFIRMATION=true
+                PATH_WORKING="test"
+                ;;
+
+	          # help:
+            # collect all unknown parameters
+            *)
+                local parameter="$1"
+
+                if [[ "$parameter" = -* ]]; then
+                    echo && error "Unknown option \"$parameter\". Abort."
+                    echo && showVersion && showHelp && exit 1
+                fi
+
+                PARAMETERS+=("$parameter")
+                ;;
+        esac
+        shift
+    done
+}
+
+# =====
+#
+# Task: Update parameter
+#
+# =====
+function updateParameter()
+{
+    $ENV_MAJOR && PARAMETERS+=("$(getMajorVersion)")
+    $ENV_MINOR && PARAMETERS+=("$(getMinorVersion)")
+    $ENV_PATCH && PARAMETERS+=("$(getPatchVersion)")
+}
+
+# =====
+#
+# Task: Checks working dir
+#
+# =====
+function checkWorkingDir()
+{
+    if [ ! -d "$PATH_WORKING" ]; then
+        echo && error "The given working directory \"$PATH_WORKING\" does not exist. Abort."
+        echo && exit 1
+    fi
+}
+
+# =====
+#
+# Task: Check version file
+#
+# =====
+function checkVersionFile()
+{
+    local versionPath="$PATH_WORKING/$PATH_VERSION_RELATIVE"
+
+    # Version file already exists.
+    if [ -f "$versionPath" ]; then
+        return 0
+    fi
+
+    # The version file was not found.
+    echo && error "Version file \"$versionPath\" not found." && echo
+
+    # Should we create one?
+    askUser "Do you want to create a version file \"$PATH_VERSION_RELATIVE\" with version \"$ENV_INIT_VERSION\"?"
+
+    # Create default initial version file.
+    echo "$ENV_INIT_VERSION" > "$versionPath"
+
+    # Inform the user.
+    if [ -f "$versionPath" ]; then
+        error "Version file \"$versionPath\" successfully created." && echo && exit 0
+    else
+        error "Unable create version file \"$versionPath\". Abort." && echo && exit 1
+    fi
+}
+
+# =====
+#
+# Task: Show current version
+#
+# =====
+function showCurrentVersion
+{
+    local currentVersion=$(getCurrentVersion)
+
+    echo
+    echo "Current version: $currentVersion"
+    echo
+    echo -n "Next major version: " && getMajorVersion && echo " (Use ${BASH_SOURCE[0]} --major)"
+    echo -n "Next minor version: " && getMinorVersion && echo " (Use ${BASH_SOURCE[0]} --minor)"
+    echo -n "Next patch version: " && getPatchVersion && echo " (Use ${BASH_SOURCE[0]} --patch)"
+    echo
+}
+
+# =====
+#
+# Task: Checks parameter
+#
+# =====
+function checkParameter
+{
+    # Get number of parameters.
+    numberParameters=${#PARAMETERS[@]}
+
+    # Check test mode.
+    if $ENV_TEST && [ "$numberParameters" -le 0 ]; then
+        executeTests
+    fi
+
+    # Check number of parameters.
+    if [ "$numberParameters" -le 0 ]; then
+        echo && error "No version was given. Abort."
+        echo && exit 1
+    fi
+
+    # Get given version.
+    local version="${PARAMETERS[0]}"
+
+    # Check version format.
+    if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+        echo && error "Unsupported version \"$version\". Expect something like \"0.2.3\". Abort."
+        echo && exit 1
+    fi
+}
+
+# =====
+#
+# Task: Show versions
+#
+# =====
+function showVersions()
+{
+    # Test mode -> stop
+    $ENV_TEST && echo && return 0
+
+    local currentVersion="$1"
+    local newVersion="$2"
+
+    echo
+    echo "Current version: $currentVersion"
+    echo "New version:     $newVersion"
+    echo
+}
+
+# =====
+#
+# Task: Confirm the changes
+#
+# =====
+function confirm()
+{
+    askUser "Do you want to set the new version \"$newVersion\" (y/n)?"
+}
+
+# =====
+#
+# Task: Set version
+#
+# =====
+function doVersion()
+{
+    # Get parameter
+    local pathRelative="$1"
+    local newVersion="$2"
+    local type="$3"
+
+    # Current file
+    local versionPath="$PATH_WORKING/$pathRelative"
+
+    # Test tmp files
+    local versionPathTmp="$PATH_WORKING/$pathRelative.tmp"
+
+    # Test mode is enabled
+    if $ENV_TEST && ! $ENV_MAJOR && ! $ENV_MINOR && ! $ENV_PATCH; then
+        echo && error "Unsupported test mode. Abort."
+        echo && exit 1
+    fi
+
+    # Check version file
+    if [ ! -f "$versionPath" ]; then
+        info "File \"$versionPath\" was not found. Skip." && return 0
+    fi
+
+    # Add file to git add
+    ENV_GIT_ADD_FILES+=" $pathRelative"
+
+    # Test mode: Create tmp file to check
+    if $ENV_TEST; then
+        # copy current files to tmp files
+        cp "$versionPath" "$versionPathTmp"
+
+        # use test files
+        versionPath="$versionPathTmp"
+    fi
+
+    # Write version
+    writeVersion "$versionPath" "$newVersion" "$type"
+
+    # Test mode: Compare files
+    if $ENV_TEST; then
+        local versionType
+
+        # Calculate compare files
+        if $ENV_MAJOR; then
+            versionType="major"
+        elif $ENV_MINOR; then
+            versionType="minor"
+        elif $ENV_PATCH; then
+            versionType="patch"
+        fi
+
+        # Compare files
+        local versionPathCompare="$PATH_WORKING/$pathRelative.$versionType"
+
+        local sha1Source=$(sha1sum "$versionPath" | awk '{print $1}')
+        local sha1Target=$(sha1sum "$versionPathCompare" | awk '{print $1}')
+
+        # Remove tmp files
+        rm "$versionPath"
+
+        if [ "$sha1Source" == "$sha1Target" ]; then
+            info "The sha1 keys match ($versionType)."
+        else
+            error  "The sha1 keys do not match ($versionType)."
+            exit 1;
+        fi
+    fi
+}
+
+# =====
+#
+# Task: Show hints
+#
+# =====
+function showHints()
+{
+    local showBorder=${1:-false}
+
+    local border=""
+    $showBorder && border="  │ "
+
+    $showBorder && echo
+    $showBorder && echo "${border}"
+    echo "${border}Now you can do the following:"
+    echo "${border}"
+    echo "${border}"
+    echo "${border}→ Edit your CHANGELOG.md file"
+    echo "${border}"
+    echo "${border}❯ vi CHANGELOG.md"
+    echo "${border}"
+    echo "${border}"
+    echo "${border}→ Usually version changes are set in the main or master branch"
+    echo "${border}"
+    echo "${border}❯ git checkout main && git pull"
+    echo "${border}"
+    echo "${border}"
+    echo "${border}→ Commit your changes to your repo"
+    echo "${border}"
+    echo "${border}❯ git add$ENV_GIT_ADD_FILES && git commit -m \"Add version \$(cat VERSION)\" && git push"
+    echo "${border}"
+    echo "${border}"
+    echo "${border}→ Tag your version"
+    echo "${border}"
+    echo "${border}❯ git tag -a \"\$(cat VERSION)\" -m \"Version \$(cat VERSION)\" && git push origin \"\$(cat VERSION)\""
+    $showBorder && echo "${border}"
+    echo
+}
+
+# a) Read parameters
+readParameter "$@"
+
+# b) Update parameter
+updateParameter
+
+# c) Check working directory
+checkWorkingDir
+
+# d) Check version file
+checkVersionFile
+
+# e) Show current version
+$ENV_ONLY_SHOW_CURRENT && showCurrentVersion && exit 0
+
+# f) Check parameter
+checkParameter && newVersion=$(getVersion) && currentVersion=$(getCurrentVersion)
+
+# g) Show versions
+showVersions "$currentVersion" "$newVersion"
+
+# h) Ask user to set new version
+confirm
+
+# i) Set version -> VERSION and .evn
+doVersion "$PATH_VERSION_RELATIVE" "$newVersion" 1
+doVersion "$PATH_ENV_RELATIVE" "$newVersion" 2
+
+# j) Show hints
+showHints true
