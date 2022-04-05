@@ -1,6 +1,6 @@
 # BashVersionManager
 
-The `bin/version-manager` tool helps you to _maintain_ the versions in the current path. It increments
+This tool helps you to _maintain_ the versions in the current path. It increments
 the patch, minor or major version and replaces them in the corresponding files.
 
 ## Create new `VERSION` file
