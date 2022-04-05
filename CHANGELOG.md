@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Releases
 
+### [0.1.1] - 2022-04-06
+
+* Change order of adding new version
+* Change documentation (README.md)
+
 ### [0.1.0] - 2022-01-03
 
 * Initial release
@@ -27,11 +32,11 @@ $ git checkout main && git pull
 # Check current version
 $ bin/version-manager --current
 
-# Change changelog
-$ vi CHANGELOG.md
-
 # Increase patch version
 $ bin/version-manager --patch
+
+# Change changelog
+$ vi CHANGELOG.md
 
 # Push new version
 $ git add CHANGELOG.md VERSION && git commit -m "Add version $(cat VERSION)" && git push
