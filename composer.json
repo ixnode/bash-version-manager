@@ -1,0 +1,37 @@
+{
+  "name": "ixnode/bash-version-manager",
+  "description": "Bash Version Manager",
+  "type": "library",
+  "license": "MIT",
+  "keywords": ["version", "manager", "semantic", "versioning", "semver"],
+  "authors": [
+    {
+      "name": "Björn Hempel",
+      "email": "bjoern@hempel.li",
+      "homepage": "https://www.hempel.li/"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Ixnode\\BashVersionManager\\": "src"
+    }
+  },
+  "require": {
+    "php":  "^7.4 || ^8.0"
+  },
+  "require-dev": {
+  },
+  "bin": [
+    "bin/version-manager"
+  ],
+  "scripts": {
+    "test": "bin/version-manager --test",
+    "php-version": "php --version",
+    "bash-version": "bash --version"
+  },
+  "scripts-descriptions": {
+    "test": "Runs all available tests.",
+    "php-version": "Shows the PHP version.",
+    "bash-version": "Shows the Bash version."
+  }
+}
