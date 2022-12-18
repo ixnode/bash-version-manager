@@ -186,6 +186,20 @@ Now you can do the following:
 ❯ git tag -a "$(cat VERSION)" -m "Version $(cat VERSION)" && git push origin "$(cat VERSION)"
 ```
 
+## Use with PHP Composer
+
+```bash
+composer require --dev ixnode/bash-version-manager
+```
+
+```bash
+vendor/bin/version-manager --version
+```
+
+```bash
+version-manager 0.1.2 (2022-12-18) - Björn Hempel <bjoern@hempel.li>
+```
+
 ## Execute tests
 
 If you want to make changes, the test mode helps to check the current changes. Test mode uses the
@@ -201,8 +215,10 @@ files in the test folder:
 * `VERSION.patch` (comparison file with patch change)
 
 ```bash
-❯ bin/version-manager --test
+bin/version-manager --test
+```
 
+```bash
 [2022-01-16 16:50:57] (info)    → The sha1 keys match (major).
 [2022-01-16 16:50:57] (info)    → The sha1 keys match (major).
 

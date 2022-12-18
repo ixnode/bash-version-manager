@@ -4,7 +4,7 @@
 # This sets the version of this project. Replaces some variables if needed.
 #
 # @author    Björn Hempel <bjoern@hempel.li>
-# @version   0.1.0 (2022-01-15)
+# @version   0.1.1 (2022-12-18)
 # ------------
 
 # ------------
@@ -39,8 +39,8 @@ PATH_WORKING="$PWD"
 
 # some environment variables
 ENV_SCRIPT_NAME=$(basename "${BASH_SOURCE[0]}")
-ENV_VERSION="0.1.0"
-ENV_VERSION_DATE="2022-01-16"
+ENV_VERSION="0.1.2"
+ENV_VERSION_DATE="2022-12-18"
 ENV_AUTHOR='Björn Hempel'
 ENV_EMAIL='bjoern@hempel.li'
 ENV_INIT_VERSION="0.1.0"
