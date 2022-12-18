@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Releases
 
+### [0.1.2] - 2022-12-18
+
+* Add composer.json to install this library via PHP composer package
+
 ### [0.1.1] - 2022-04-06
 
 * Change order of adding new version
