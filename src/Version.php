@@ -15,7 +15,12 @@ namespace Ixnode\BashVersionManager;
 
 use Composer\Autoload\ClassLoader;
 use Ixnode\PhpContainer\File;
+use Ixnode\PhpContainer\Json;
+use Ixnode\PhpException\ArrayType\ArrayKeyNotFoundException;
 use Ixnode\PhpException\File\FileNotFoundException;
+use Ixnode\PhpException\Function\FunctionJsonEncodeException;
+use Ixnode\PhpException\Type\TypeInvalidException;
+use JsonException;
 use ReflectionClass;
 
 /**
@@ -35,7 +40,13 @@ class Version
 
     public const PATH_VERSION = 'VERSION';
 
+    public const PATH_COMPOSER_JSON = 'composer.json';
+
     public const INDEX_VERSION = 'version';
+
+    public const INDEX_NAME = 'name';
+
+    public const INDEX_DESCRIPTION = 'description';
 
     public const INDEX_DATE = 'date';
 
@@ -67,9 +78,35 @@ class Version
      */
     public function getVersion(): string
     {
-        $versionFile = $this->getVersionFile();
+        return $this->getVersionFile()->getContentAsTextTrim();
+    }
 
-        return (new File($versionFile))->getContentAsTextTrim();
+    /**
+     * Returns the name of this application.
+     *
+     * @return string
+     * @throws ArrayKeyNotFoundException
+     * @throws FunctionJsonEncodeException
+     * @throws JsonException
+     * @throws TypeInvalidException
+     */
+    public function getName(): string
+    {
+        return $this->getComposerKey(self::INDEX_NAME);
+    }
+
+    /**
+     * Returns the description of this application.
+     *
+     * @return string
+     * @throws ArrayKeyNotFoundException
+     * @throws FunctionJsonEncodeException
+     * @throws JsonException
+     * @throws TypeInvalidException
+     */
+    public function getDescription(): string
+    {
+        return $this->getComposerKey(self::INDEX_DESCRIPTION);
     }
 
     /**
@@ -80,15 +117,7 @@ class Version
      */
     public function getDate(): string
     {
-        $versionFile = $this->getVersionFile();
-
-        $mtime = filemtime($versionFile);
-
-        if ($mtime === false) {
-            throw new FileNotFoundException($versionFile);
-        }
-
-        return date ('l, F d, Y - H:i:s', $mtime);
+        return $this->getVersionFile()->getDate();
     }
 
     /**
@@ -120,6 +149,8 @@ class Version
     public function getAll(): array
     {
         return [
+            self::INDEX_NAME => $this->getName(),
+            self::INDEX_DESCRIPTION => $this->getDescription(),
             self::INDEX_VERSION => $this->getVersion(),
             self::INDEX_DATE => $this->getDate(),
             self::INDEX_LICENSE => $this->getLicense(),
@@ -130,10 +161,37 @@ class Version
     /**
      * Returns the version file.
      *
-     * @return string
+     * @return File
      */
-    public function getVersionFile(): string
+    public function getVersionFile(): File
     {
-        return sprintf('%s/%s', $this->rootDir, self::PATH_VERSION);
+        return new File(sprintf('%s/%s', $this->rootDir, self::PATH_VERSION));
+    }
+
+    /**
+     * Returns the composer json file.
+     *
+     * @return File
+     */
+    public function getComposerFile(): File
+    {
+        return new File(sprintf('%s/%s', $this->rootDir, self::PATH_COMPOSER_JSON));
+    }
+
+    /**
+     * Returns a value from composer.json given by key name.
+     *
+     * @param string|string[] $keys
+     * @return string
+     * @throws FunctionJsonEncodeException
+     * @throws TypeInvalidException
+     * @throws JsonException
+     * @throws ArrayKeyNotFoundException
+     */
+    public function getComposerKey(string|array $keys): string
+    {
+        $json = new Json($this->getComposerFile());
+
+        return $json->getKeyString($keys);
     }
 }

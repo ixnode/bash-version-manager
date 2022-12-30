@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e14d99b6a71afe1b178fac15eca317f5",
+    "content-hash": "8a40098f6d4cae9f97233432090673ea",
     "packages": [
         {
             "name": "ixnode/php-checker",
@@ -66,16 +66,16 @@
         },
         {
             "name": "ixnode/php-container",
-            "version": "0.1.0",
+            "version": "0.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ixnode/php-container.git",
-                "reference": "a64dce29a958cc473251b5c8fd369d637e7b6efd"
+                "reference": "5c6e55b3031b3563be2cb42e6585b861c88e4542"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ixnode/php-container/zipball/a64dce29a958cc473251b5c8fd369d637e7b6efd",
-                "reference": "a64dce29a958cc473251b5c8fd369d637e7b6efd",
+                "url": "https://api.github.com/repos/ixnode/php-container/zipball/5c6e55b3031b3563be2cb42e6585b861c88e4542",
+                "reference": "5c6e55b3031b3563be2cb42e6585b861c88e4542",
                 "shasum": ""
             },
             "require": {
@@ -123,9 +123,9 @@
             ],
             "support": {
                 "issues": "https://github.com/ixnode/php-container/issues",
-                "source": "https://github.com/ixnode/php-container/tree/0.1.0"
+                "source": "https://github.com/ixnode/php-container/tree/0.1.2"
             },
-            "time": "2022-12-30T19:02:45+00:00"
+            "time": "2022-12-30T21:47:23+00:00"
         },
         {
             "name": "ixnode/php-exception",

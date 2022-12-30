@@ -41,6 +41,8 @@ final class VersionTest extends TestCase
         $versionString = $this->getVersionString();
         $dateString = $this->getDateString();
         $versionArray = [
+            Version::INDEX_NAME => 'ixnode/bash-version-manager',
+            Version::INDEX_DESCRIPTION => 'Bash Version Manager',
             Version::INDEX_VERSION => $versionString,
             Version::INDEX_DATE => $dateString,
             Version::INDEX_LICENSE => Version::VALUE_LICENSE,
@@ -64,7 +66,7 @@ final class VersionTest extends TestCase
     {
         $versionFile = (new Version())->getVersionFile();
 
-        return (new File($versionFile))->getContentAsTextTrim();
+        return $versionFile->getContentAsTextTrim();
     }
 
     /**
@@ -77,10 +79,10 @@ final class VersionTest extends TestCase
     {
         $versionFile = (new Version())->getVersionFile();
 
-        $mtime = filemtime($versionFile);
+        $mtime = filemtime($versionFile->getPathReal());
 
         if ($mtime === false) {
-            throw new FileNotFoundException($versionFile);
+            throw new FileNotFoundException($versionFile->getPath());
         }
 
         return date ('l, F d, Y - H:i:s', $mtime);

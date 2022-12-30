@@ -24,7 +24,7 @@
   "require": {
     "php":  "^8.0",
     "ixnode/php-exception": "^0.1.7",
-    "ixnode/php-container": "^0.1.0"
+    "ixnode/php-container": "^0.1.2"
   },
   "bin": [
     "bin/version-manager"
