@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /*
- * This file is part of the ixno/php-naming-conventions project.
+ * This file is part of the ixno/bash-version-manager project.
  *
  * (c) Björn Hempel <https://www.hempel.li/>
  *

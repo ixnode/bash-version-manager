@@ -13,25 +13,62 @@
   ],
   "autoload": {
     "psr-4": {
-      "Ixnode\\BashVersionManager\\": "src"
+      "Ixnode\\BashVersionManager\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Ixnode\\BashVersionManager\\Tests\\": "tests/"
     }
   },
   "require": {
-    "php":  "^7.4 || ^8.0"
-  },
-  "require-dev": {
+    "php":  "^8.0",
+    "ixnode/php-exception": "^0.1.7",
+    "ixnode/php-container": "^0.1.0"
   },
   "bin": [
     "bin/version-manager"
   ],
   "scripts": {
-    "test": "bin/version-manager --test",
+    "ixno:header": "bin/header/ixno",
+
+    "vm": "bin/header/vm 'bin/version-manager --test' 'All'",
+
+    "phpunit": "bin/header/phpunit 'phpunit -d memory_limit=512M --configuration phpunit.xml' 'Unit'",
+
+    ".test:all": [
+      "@ixno:header",
+      "@vm",
+      "@phpunit"
+    ],
+    "test:all": [
+      "composer .test:all && bin/header/success || bin/header/error"
+    ],
+    "test": [
+      "@test:all"
+    ],
+
     "php-version": "php --version",
     "bash-version": "bash --version"
   },
   "scripts-descriptions": {
-    "test": "Runs all available tests.",
+    ".test:all": "Not used (Hidden command).",
+    ".test:basic": "Not used (Hidden command).",
+    ".test:hardcore": "Not used (Hidden command).",
+    ".test:most": "Not used (Hidden command).",
+
+    "ixno:header": "Shows ixno test header.",
+
+    "vm": "Runs version manager test.",
+
+    "phpunit": "Runs PHPUnit unit tests (all tests).",
+
+    "test": "Runs all available tests (vm, phpunit, etc.).",
+
     "php-version": "Shows the PHP version.",
     "bash-version": "Shows the Bash version."
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^9"
   }
 }

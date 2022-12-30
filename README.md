@@ -200,6 +200,16 @@ vendor/bin/version-manager --version
 version-manager 0.1.2 (2022-12-18) - Björn Hempel <bjoern@hempel.li>
 ```
 
+### `Version` class usage
+
+```php
+use Ixnode\BashVersionManager\Version;
+```
+
+```php
+$versionArray = (new Version())->getAll();
+```
+
 ## Execute tests
 
 If you want to make changes, the test mode helps to check the current changes. Test mode uses the
