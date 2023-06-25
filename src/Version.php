@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the ixno/bash-version-manager project.
+ * This file is part of the ixnode/bash-version-manager project.
  *
  * (c) Björn Hempel <https://www.hempel.li/>
  *
@@ -17,7 +17,9 @@ use Composer\Autoload\ClassLoader;
 use Ixnode\PhpContainer\File;
 use Ixnode\PhpContainer\Json;
 use Ixnode\PhpException\ArrayType\ArrayKeyNotFoundException;
+use Ixnode\PhpException\Case\CaseInvalidException;
 use Ixnode\PhpException\File\FileNotFoundException;
+use Ixnode\PhpException\File\FileNotReadableException;
 use Ixnode\PhpException\Function\FunctionJsonEncodeException;
 use Ixnode\PhpException\Type\TypeInvalidException;
 use JsonException;
@@ -59,6 +61,8 @@ class Version
 
     public const INDEX_COMPOSER = 'composer-version';
 
+    public const INDEX_PHP_EXCEPTION = 'php-exception';
+
     protected const APP_COMPOSER = 'composer';
 
     protected ?string $rootDir = null;
@@ -93,6 +97,9 @@ class Version
      *
      * @return string
      * @throws ArrayKeyNotFoundException
+     * @throws CaseInvalidException
+     * @throws FileNotFoundException
+     * @throws FileNotReadableException
      * @throws FunctionJsonEncodeException
      * @throws JsonException
      * @throws TypeInvalidException
@@ -107,6 +114,9 @@ class Version
      *
      * @return string
      * @throws ArrayKeyNotFoundException
+     * @throws CaseInvalidException
+     * @throws FileNotFoundException
+     * @throws FileNotReadableException
      * @throws FunctionJsonEncodeException
      * @throws JsonException
      * @throws TypeInvalidException
@@ -154,27 +164,7 @@ class Version
      */
     public function getVersionComposer(): string
     {
-        $output = [];
-
-        $returnValue = null;
-
-        exec(sprintf('%s -V', self::APP_COMPOSER), $output, $returnValue);
-
-        if ($returnValue !== 0) {
-            return sprintf('%s is not available', self::APP_COMPOSER);
-        }
-
-        $string = implode("\n", $output);
-
-        $matches = [];
-
-        $result = preg_match('~[0-9]+\.[0-9]+\.[0-9]~', $string, $matches);
-
-        if ($result !== 1) {
-            return sprintf('Unable to get %s version.', self::APP_COMPOSER);
-        }
-
-        return strval(current($matches));
+        return $this->executeComposerCommand(sprintf('%s -V', self::APP_COMPOSER));
     }
 
     /**
@@ -185,6 +175,17 @@ class Version
     public function getVersionPhp(): string
     {
         return phpversion();
+    }
+
+    /**
+     * Shows the composer package version.
+     *
+     * @param string $package
+     * @return string
+     */
+    public function getVersionComposerPackage(string $package): string
+    {
+        return $this->executeComposerCommand(sprintf('%s show | grep "%s"', self::APP_COMPOSER, $package));
     }
 
     /**
@@ -208,6 +209,7 @@ class Version
             self::INDEX_AUTHORS => $this->getAuthors(),
             self::INDEX_PHP => $this->getVersionPhp(),
             self::INDEX_COMPOSER => $this->getVersionComposer(),
+            self::INDEX_PHP_EXCEPTION => $this->getVersionComposerPackage('ixnode/php-exception'),
         ];
     }
 
@@ -236,15 +238,49 @@ class Version
      *
      * @param string|string[] $keys
      * @return string
-     * @throws FunctionJsonEncodeException
-     * @throws TypeInvalidException
-     * @throws JsonException
      * @throws ArrayKeyNotFoundException
+     * @throws FileNotFoundException
+     * @throws FunctionJsonEncodeException
+     * @throws JsonException
+     * @throws TypeInvalidException
+     * @throws CaseInvalidException
+     * @throws FileNotReadableException
      */
     public function getComposerKey(string|array $keys): string
     {
         $json = new Json($this->getComposerFile());
 
         return $json->getKeyString($keys);
+    }
+
+    /**
+     * Executes the composer command and returns the version.
+     *
+     * @param string $command
+     * @return string
+     */
+    private function executeComposerCommand(string $command): string
+    {
+        $output = [];
+
+        $returnValue = null;
+
+        exec($command, $output, $returnValue);
+
+        if ($returnValue !== 0) {
+            return sprintf('%s is not available', self::APP_COMPOSER);
+        }
+
+        $string = implode("\n", $output);
+
+        $matches = [];
+
+        $result = preg_match('~[0-9]+\.[0-9]+\.[0-9]+~', $string, $matches);
+
+        if ($result !== 1) {
+            return sprintf('Unable to get %s version.', self::APP_COMPOSER);
+        }
+
+        return strval(current($matches));
     }
 }

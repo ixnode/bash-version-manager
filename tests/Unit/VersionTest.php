@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the ixno/bash-version-manager project.
+ * This file is part of the ixnode/bash-version-manager project.
  *
  * (c) Björn Hempel <https://www.hempel.li/>
  *
@@ -56,6 +56,7 @@ final class VersionTest extends TestCase
             Version::INDEX_AUTHORS => Version::VALUE_AUTHORS,
             Version::INDEX_PHP => '8.2.7',
             Version::INDEX_COMPOSER => '2.5.1',
+            Version::INDEX_PHP_EXCEPTION => '0.1.19',
         ];
 
         /* Act */

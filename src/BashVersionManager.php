@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the ixno/bash-version-manager project.
+ * This file is part of the ixnode/bash-version-manager project.
  *
  * (c) Björn Hempel <https://www.hempel.li/>
  *
