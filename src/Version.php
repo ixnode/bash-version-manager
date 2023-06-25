@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the ixno/bash-version-manager project.
  *
@@ -10,6 +8,8 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE.md
  * file that was distributed with this source code.
  */
+
+declare(strict_types=1);
 
 namespace Ixnode\BashVersionManager;
 
@@ -27,7 +27,8 @@ use ReflectionClass;
  * Class Version
  *
  * @author Björn Hempel <bjoern@hempel.li>
- * @version 0.1.0 (2022-12-30)
+ * @version 0.1.1 (2023-06-24)
+ * @since 0.1.1 (2023-06-24) Refactoring. Add more versions.
  * @since 0.1.0 (2022-12-30) First version.
  */
 class Version
@@ -53,6 +54,12 @@ class Version
     public const INDEX_LICENSE = 'license';
 
     public const INDEX_AUTHORS = 'authors';
+
+    public const INDEX_PHP = 'php-version';
+
+    public const INDEX_COMPOSER = 'composer-version';
+
+    protected const APP_COMPOSER = 'composer';
 
     protected ?string $rootDir = null;
 
@@ -141,10 +148,54 @@ class Version
     }
 
     /**
+     * Returns the composer version.
+     *
+     * @return string
+     */
+    public function getVersionComposer(): string
+    {
+        $output = [];
+
+        $returnValue = null;
+
+        exec(sprintf('%s -V', self::APP_COMPOSER), $output, $returnValue);
+
+        if ($returnValue !== 0) {
+            return sprintf('%s is not available', self::APP_COMPOSER);
+        }
+
+        $string = implode("\n", $output);
+
+        $matches = [];
+
+        $result = preg_match('~[0-9]+\.[0-9]+\.[0-9]~', $string, $matches);
+
+        if ($result !== 1) {
+            return sprintf('Unable to get %s version.', self::APP_COMPOSER);
+        }
+
+        return strval(current($matches));
+    }
+
+    /**
+     * Returns the php version of this application.
+     *
+     * @return string
+     */
+    public function getVersionPhp(): string
+    {
+        return phpversion();
+    }
+
+    /**
      * Returns all information.
      *
      * @return array{version: string, license: string, authors: array<int, string>}
+     * @throws ArrayKeyNotFoundException
      * @throws FileNotFoundException
+     * @throws FunctionJsonEncodeException
+     * @throws JsonException
+     * @throws TypeInvalidException
      */
     public function getAll(): array
     {
@@ -155,6 +206,8 @@ class Version
             self::INDEX_DATE => $this->getDate(),
             self::INDEX_LICENSE => $this->getLicense(),
             self::INDEX_AUTHORS => $this->getAuthors(),
+            self::INDEX_PHP => $this->getVersionPhp(),
+            self::INDEX_COMPOSER => $this->getVersionComposer(),
         ];
     }
 

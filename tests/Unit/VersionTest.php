@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the ixno/bash-version-manager project.
  *
@@ -11,11 +9,16 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Ixnode\BashVersionManager\Tests\Unit;
 
 use Ixnode\BashVersionManager\Version;
-use Ixnode\PhpContainer\File;
+use Ixnode\PhpException\ArrayType\ArrayKeyNotFoundException;
 use Ixnode\PhpException\File\FileNotFoundException;
+use Ixnode\PhpException\Function\FunctionJsonEncodeException;
+use Ixnode\PhpException\Type\TypeInvalidException;
+use JsonException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -34,6 +37,10 @@ final class VersionTest extends TestCase
      * @test
      *
      * @throws FileNotFoundException
+     * @throws ArrayKeyNotFoundException
+     * @throws FunctionJsonEncodeException
+     * @throws TypeInvalidException
+     * @throws JsonException
      */
     public function wrapper(): void
     {
@@ -47,6 +54,8 @@ final class VersionTest extends TestCase
             Version::INDEX_DATE => $dateString,
             Version::INDEX_LICENSE => Version::VALUE_LICENSE,
             Version::INDEX_AUTHORS => Version::VALUE_AUTHORS,
+            Version::INDEX_PHP => '8.2.7',
+            Version::INDEX_COMPOSER => '2.5.1',
         ];
 
         /* Act */
