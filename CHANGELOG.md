@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Releases
 
+### [0.1.8] - 2023-08-14
+
+* Change copyright year from 2022 to 2023
+
 ### [0.1.7] - 2023-06-25
 
 * Add composer package version parser
