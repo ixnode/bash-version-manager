@@ -35,7 +35,7 @@ use ReflectionClass;
  */
 class Version
 {
-    public const VALUE_LICENSE = 'Copyright (c) 2022 Björn Hempel';
+    public const VALUE_LICENSE = 'Copyright (c) 2023 Björn Hempel';
 
     public const VALUE_AUTHORS = [
         'Björn Hempel <bjoern@hempel.li>',
