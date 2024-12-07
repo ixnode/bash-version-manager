@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7b815ebc9c73ff37753c79142d0525f6",
+    "content-hash": "0e2bbf2cae3986247f05ea94893af2ae",
     "packages": [
         {
             "name": "ixnode/php-checker",
@@ -130,20 +130,20 @@
         },
         {
             "name": "ixnode/php-exception",
-            "version": "0.1.19",
+            "version": "0.1.21",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ixnode/php-exception.git",
-                "reference": "8eb8b682be8a2e254a7dece7f0d8dec1e5ab99d7"
+                "reference": "0c82481422f56005a14d965c1b6884ad7c37ae0c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ixnode/php-exception/zipball/8eb8b682be8a2e254a7dece7f0d8dec1e5ab99d7",
-                "reference": "8eb8b682be8a2e254a7dece7f0d8dec1e5ab99d7",
+                "url": "https://api.github.com/repos/ixnode/php-exception/zipball/0c82481422f56005a14d965c1b6884ad7c37ae0c",
+                "reference": "0c82481422f56005a14d965c1b6884ad7c37ae0c",
                 "shasum": ""
             },
             "require": {
-                "php": "^8.0"
+                "php": "^8.2"
             },
             "require-dev": {
                 "friendsofphp/php-cs-fixer": "^3.13",
@@ -175,18 +175,19 @@
                     "homepage": "https://www.hempel.li/"
                 }
             ],
-            "description": "PHP Exception",
+            "description": "PHP Exception - This library offers some ready to use PHP Exceptions.",
             "keywords": [
                 "exception",
                 "exception-handling",
                 "php",
-                "php8"
+                "php8",
+                "php8.2"
             ],
             "support": {
                 "issues": "https://github.com/ixnode/php-exception/issues",
-                "source": "https://github.com/ixnode/php-exception/tree/0.1.19"
+                "source": "https://github.com/ixnode/php-exception/tree/0.1.21"
             },
-            "time": "2023-06-24T21:47:37+00:00"
+            "time": "2023-07-03T21:13:30+00:00"
         },
         {
             "name": "ixnode/php-size-byte",
@@ -1981,12 +1982,12 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {},
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
         "php": "^8.0"
     },
-    "platform-dev": [],
-    "plugin-api-version": "2.3.0"
+    "platform-dev": {},
+    "plugin-api-version": "2.6.0"
 }

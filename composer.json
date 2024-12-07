@@ -23,7 +23,7 @@
   },
   "require": {
     "php":  "^8.0",
-    "ixnode/php-exception": "^0.1.19",
+    "ixnode/php-exception": "^0.1.21",
     "ixnode/php-container": "^0.1.8",
     "ixnode/php-checker": "^0.1.9"
   },
