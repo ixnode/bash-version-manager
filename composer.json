@@ -1,6 +1,7 @@
 {
   "name": "ixnode/bash-version-manager",
   "description": "Bash Version Manager",
+  "version": "0.1.9",
   "type": "library",
   "license": "MIT",
   "keywords": ["version", "manager", "semantic", "versioning", "semver"],

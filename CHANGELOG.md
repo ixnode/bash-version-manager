@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Releases
 
+### [0.1.9] - 2024-12-07
+
+* Update ixnode/php-exception to version 0.1.21
+
 ### [0.1.8] - 2023-08-14
 
 * Change copyright year from 2022 to 2023
